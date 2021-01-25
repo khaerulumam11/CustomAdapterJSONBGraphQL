@@ -1,0 +1,168 @@
+query GetPeopleProfileAbout($userId: uuid){
+    people_profile(where: {id: {_eq: $userId}}) {
+        id
+        gender
+        settings_section
+        global_city {
+            id
+            name
+        }
+        global_province{
+            id
+            name
+        }
+        birthplace_province_name
+        birthplace_city_name
+        birthdate
+        religion
+        global_religion{
+            id
+            name
+        }
+        marital_status
+        blood_type
+        people_phone {
+            id
+            label_name
+            country_code
+            phone
+        }
+        people_address {
+            name
+            id
+            address
+            global_province {
+                id
+                name
+            }
+            global_city {
+                id
+                name
+            }
+            postal_code
+        }
+        profile_fields
+    }
+
+    #        educations:people_profile_educations(where: {user: {_eq: $userId}}, order_by: {global_degree: {id: desc}}) {
+    educations:people_profile_educations(where: {user: {_eq: $userId}}, order_by: [{global_degree: {id: desc}}]) {
+        id
+        company_profile{
+            id
+            legal_name
+            logo
+        }
+        global_degree {
+            id
+            name
+        }
+        global_faculty{
+            id
+            name
+        }
+        from
+        to
+        description
+        is_present
+    }
+
+    work_experiences:people_work_placements(where: {user: {_eq: $userId}}) {
+        id
+        regno
+        company_profile {
+            id
+            legal_name
+            logo
+        }
+        company_address{
+            global_city{
+                id
+                name
+            }
+            global_province{
+                id
+                name
+            }
+        }
+        company_employee_position {
+            name
+            position_fields
+        }
+        start_date
+        end_date
+        status
+    }
+
+    people_profile_experiences(
+        where:{
+            user:{_eq:$userId}
+        }
+    ){
+        id
+        title
+        company_name
+        company_profile{
+            id
+            brand_name
+            legal_name
+            logo
+        }
+        location
+        from
+        to
+        is_present
+        description
+    }
+
+    certificate: people_profile_certificates(
+        where:{
+            user:{_eq: $userId}
+        }
+    ){
+        id
+        company_profile{
+            brand_name
+            logo
+            global_company_industry_type{
+                name
+            }
+        }
+        name
+        issuer_name
+        date_issued
+        date_expired
+        credential_id
+        credential_url
+        certificate_fields
+        can_expire
+    }
+
+    skills: people_profile_skills(where: {user: {_eq: $userId}}, order_by: [{id: desc}]) {
+        id
+        description
+        level
+        people_skill_level {
+            id
+            name
+        }
+        skill_fields
+        people_skill {
+            id
+            name
+        }
+        people_profile_skill_endorsements(limit: 5, order_by: [{id: desc}]) {
+            global_user {
+                id
+                name
+                avatar
+            }
+        }
+        people_profile_skill_endorsements_aggregate{
+            aggregate{
+                count
+            }
+        }
+
+    }
+
+}

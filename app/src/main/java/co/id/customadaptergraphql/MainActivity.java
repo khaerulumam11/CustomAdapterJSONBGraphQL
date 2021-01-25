@@ -21,7 +21,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 
 import co.id.customadaptergraphql.graphql.GraphQLServerGet;
-import co.id.customadaptergraphql.testing.MyQuery;
+import co.id.customadaptergraphql.testing.GetPeopleProfileAboutQuery;
+import co.id.customadaptergraphql.testing.GetPeopleProfileDetailQuery;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,59 +38,77 @@ public class MainActivity extends AppCompatActivity {
         txtExample = findViewById(R.id.textView);
 
         fetchData();
-
+        fetchDataPeople();
     }
 
-    private void convertJSONObject() {
-        for (int x=0; x < jsonObject.length(); x++){
-            try {
-                System.out.println("List JSON Object Name "+jsonObject.getString("name"));
-                System.out.println("List JSON Object isObject "+jsonObject.getBoolean("isObject"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-    private void convertJSONArray(String raw) {
-        String[] output=null;
-        output = raw.split(",");
-        output[0] = output[0].replace("[","");
-        output[output.length-1] = output[output.length-1].replace("]","");
-
-        for (int a =0; a < output.length; a++){
-            System.out.println("Isi JSON Array "+output[a]);
-        }
-    }
+//    private void convertJSONObject() {
+//        for (int x=0; x < jsonObject.length(); x++){
+//            try {
+//                System.out.println("List JSON Object Name "+jsonObject.getString("name"));
+//                System.out.println("List JSON Object isObject "+jsonObject.getBoolean("isObject"));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+//    }
+//
+//    private void convertJSONArray(String raw) {
+//        String[] output=null;
+//        output = raw.split(",");
+//        output[0] = output[0].replace("[","");
+//        output[output.length-1] = output[output.length-1].replace("]","");
+//
+//        for (int a =0; a < output.length; a++){
+//            System.out.println("Isi JSON Array "+output[a]);
+//        }
+//    }
 
     private void fetchData() {
-        final MyQuery query = MyQuery
+        final GetPeopleProfileDetailQuery query = GetPeopleProfileDetailQuery
                 .builder()
+                .userId(String.valueOf("af8d8b1b-bc69-49bb-b875-7ddb00a73032"))
                 .build();
         GraphQLServerGet.getApolloClient().query(query).responseFetcher(ApolloResponseFetchers.NETWORK_FIRST).enqueue(dataCallback);
     }
-
-    ApolloCall.Callback<MyQuery.Data> dataCallback = new ApolloCall.Callback<MyQuery.Data>() {
+//
+    ApolloCall.Callback<GetPeopleProfileDetailQuery.Data> dataCallback = new ApolloCall.Callback<GetPeopleProfileDetailQuery.Data>() {
         @Override
-        public void onResponse(@NotNull Response<MyQuery.Data> response) {
+        public void onResponse(@NotNull Response<GetPeopleProfileDetailQuery.Data> response) {
             runOnUiThread(() -> {
                 if (response.data() != null){
-                    for (int a =0; a < response.data().test().size(); a++){
-                        System.out.println("JSON Array "+response.data().test().get(a).obj1());
-                        System.out.println("JSON Object "+response.data().test().get(a).obj2());
-                        //convert to JSON Array
-                        convertJSONArray(response.data().test().get(a).obj1().toString());
-                        //convert to JSON Object
-                        try {
-                            jsonObject = new JSONObject(response.data().test().get(a).obj2().toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    for (int a =0; a < response.data().global_users().get(0).people_addresses().size(); a++){
+                        System.out.println("Data Province "+response.data().global_users().get(0).people_addresses().get(a).global_province().name());
+                        System.out.println("Data City "+response.data().global_users().get(0).people_addresses().get(a).global_city().name());
                     }
+                }
+            });
 
+        }
 
-                    convertJSONObject();
+        @Override
+        public void onFailure(@NotNull ApolloException e) {
+            String eror = e.getMessage();
+            Log.e("a", e.getMessage(), e);
+
+        }
+    };
+
+    private void fetchDataPeople() {
+        final GetPeopleProfileAboutQuery query = GetPeopleProfileAboutQuery
+                .builder()
+                .userId(String.valueOf("af8d8b1b-bc69-49bb-b875-7ddb00a73032"))
+                .build();
+        GraphQLServerGet.getApolloClient().query(query).responseFetcher(ApolloResponseFetchers.NETWORK_FIRST).enqueue(dataCallback1);
+    }
+    //
+    ApolloCall.Callback<GetPeopleProfileAboutQuery.Data> dataCallback1 = new ApolloCall.Callback<GetPeopleProfileAboutQuery.Data>() {
+        @Override
+        public void onResponse(@NotNull Response<GetPeopleProfileAboutQuery.Data> response) {
+            runOnUiThread(() -> {
+                if (response.data() != null){
+                    System.out.println("Data City People "+response.data().people_profile().get(0).global_city().name());
+                    System.out.println("Data Province People "+response.data().people_profile().get(0).global_province().name());
                 }
             });
 

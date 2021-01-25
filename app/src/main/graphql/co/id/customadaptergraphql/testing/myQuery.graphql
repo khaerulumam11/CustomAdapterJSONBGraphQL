@@ -1,7 +1,0 @@
-query MyQuery {
-    test {
-        id
-        obj1
-        obj2
-    }
-}

@@ -1,0 +1,63 @@
+query GetPeopleProfileDetail($userId: uuid){
+    global_users(where: {id: {_eq: $userId}}) {
+        id
+        avatar
+        name
+        email
+        people_profiles{
+            profile_fields
+            settings_section
+        }
+        people_work_placements(limit: 2, order_by: [{id: desc}]) {
+            id
+            company_employee_position {
+                name
+            }
+            company_profile {
+                brand_name
+            }
+        }
+        people_profile_educations(distinct_on: [school]) {
+            school
+            company_profile {
+                brand_name
+            }
+        }
+        people_phones(order_by: [{is_main: desc_nulls_last, id: asc}]) {
+            id
+            label_name
+            country_code
+            globalPhoneCode{
+                country
+            }
+            phone
+            is_main
+            is_visible
+        }
+        people_addresses(order_by: [{is_main: desc_nulls_last, id: asc}]){
+            name
+            id
+            address
+            global_province {
+                id
+                name
+            }
+            global_city {
+                id
+                name
+            }
+            postal_code
+            is_main
+
+        }
+        people_emails(where:{deletedAt:{_is_null:true}}){
+            email
+            status
+            global_user{
+                email
+            }
+            is_main
+            is_visible
+        }
+    }
+}
